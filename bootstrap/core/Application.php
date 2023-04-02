@@ -4,15 +4,33 @@ namespace Core;
 
 class Application
 {
+    /**
+     * @var Container
+     */
     protected static Container $container;
+    /**
+     * @var array
+     */
+
     protected array $server;
+    /**
+     * @var array
+     */
+
     protected array $request;
 
+    /**
+     * @param Container $container
+     * @return void
+     */
     public static function setContainer(Container $container): void
     {
         static::$container = $container;
     }
 
+    /**
+     * @return Container
+     */
     public static function container(): Container
     {
         return static::$container;
@@ -34,6 +52,9 @@ class Application
         static::container()->bind($key, $resolver);
     }
 
+    /**
+     * @return $this
+     */
     public function bootRoutes(): static
     {
         $router = require BASE_PATH . "/routes/index.php";
@@ -46,18 +67,29 @@ class Application
         return $this;
     }
 
+    /**
+     * @param array $server
+     * @return $this
+     */
     public function start(array $server): self
     {
         $this->server = $server;
         return $this;
     }
 
+    /**
+     * @param array $request
+     * @return $this
+     */
     public function capture(array $request): self
     {
         $this->request = $request;
         return $this;
     }
 
+    /**
+     * @return void
+     */
     public function serve(): void
     {
         $this->bootRoutes();

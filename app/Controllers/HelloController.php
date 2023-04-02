@@ -4,11 +4,9 @@ namespace App\Controllers;
 
 class HelloController extends Controller
 {
-    /**
-     * @throws \Exception
-     */
     public function index(): false|string
     {
+        dd(config('app'));
         return view('hello.view');
     }
 }

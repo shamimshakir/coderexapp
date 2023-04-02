@@ -4,6 +4,8 @@
 use Core\Application;
 
 
+$dotenv = Dotenv\Dotenv::createImmutable(base_path('/'));
+$dotenv->load();
 
 $app = new Application;
 
