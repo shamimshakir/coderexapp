@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Router;
+namespace Core;
 
 class Router
 {
@@ -19,7 +19,7 @@ class Router
                 return (new $route['handler'])->{$route['func']}();
             }
         }
-        abort(404);
+        return abort(404);
     }
 
     public function add(

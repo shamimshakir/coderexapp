@@ -2,7 +2,7 @@
 
 
 use App\Controllers\HelloController;
-use Core\Router\Router;
+use Core\Router;
 
 
 $router = new Router;
