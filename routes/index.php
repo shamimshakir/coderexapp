@@ -7,7 +7,8 @@ use Core\Router;
 
 $router = new Router;
 
-$router->get('/hello', HelloController::class, 'index');
+$router->get('/hello/{id}/product/{product_id}/order', HelloController::class, 'index');
+$router->post('/hello/{id}/product/{product_id}/order', HelloController::class, 'store');
 
 
 

@@ -2,11 +2,18 @@
 
 namespace App\Controllers;
 
+use Core\Request;
+
 class HelloController extends Controller
 {
-    public function index(): false|string
+    public function index(Request $request): false|string
     {
-        dd(config('app'));
+        dd($request);
         return view('hello.view');
+    }
+
+    public function store(Request $request)
+    {
+        dd($request);
     }
 }

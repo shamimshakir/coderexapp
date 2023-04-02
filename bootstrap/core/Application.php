@@ -17,7 +17,7 @@ class Application
      * @var array
      */
 
-    protected array $request;
+    protected Request $request;
 
     /**
      * @param Container $container
@@ -57,13 +57,16 @@ class Application
      */
     public function bootRoutes(): static
     {
-        $router = require BASE_PATH . "/routes/index.php";
-        $uri = parse_url($_SERVER['REQUEST_URI'])['path'];
-        $method = $_SERVER['_method'] ?? $_SERVER['REQUEST_METHOD'];
-        $router->route(
-            $method,
-            $uri
-        );
+        $router = require base_path('routes/index.php');
+
+        $uri = parse_url($this->server['REQUEST_URI'])['path'];
+        $method = $this->request->body->_method ?? $this->server['REQUEST_METHOD'];
+        /** @var Router $router */
+        $router->setApp($this)
+            ->route(
+                $method,
+                $uri
+            );
         return $this;
     }
 
@@ -83,7 +86,7 @@ class Application
      */
     public function capture(array $request): self
     {
-        $this->request = $request;
+        $this->request = Request::capture($request, $this->server);
         return $this;
     }
 
@@ -93,5 +96,13 @@ class Application
     public function serve(): void
     {
         $this->bootRoutes();
+    }
+
+    /**
+     * @return Request
+     */
+    public function getRequest(): Request
+    {
+        return $this->request;
     }
 }

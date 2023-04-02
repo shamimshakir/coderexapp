@@ -10,6 +10,6 @@ require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
 /** @var Application $app */
-$app->capture($_REQUEST)
-    ->start($_SERVER)
+$app->start($_SERVER)
+    ->capture($_REQUEST)
     ->serve();

@@ -4,6 +4,8 @@ namespace Core;
 
 class Router
 {
+    protected Application $app;
+
     protected array $routes = [];
 
     public function route(
@@ -13,13 +15,33 @@ class Router
     {
         foreach ($this->routes as $route) {
             if (
-                $route['uri'] === $uri
+                $this->match($route, $uri)
                 && strtoupper($method) === $route['method']
             ) {
-                return (new $route['handler'])->{$route['func']}();
+                return (new $route['handler'])->{$route['func']}(
+                    $this->app->getRequest()
+                );
             }
         }
         return abort(404);
+    }
+
+    /**
+     * @param $route
+     * @param $uri
+     * @return bool
+     */
+    private function match(&$route, $uri): bool
+    {
+        if (preg_match($route['matcher'], $uri, $matches)) {
+            foreach ($matches as $key => $value) {
+                if (is_string($key) && !is_numeric($key)) {
+                    $route['params'][$key] = $value;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     public function add(
@@ -29,11 +51,17 @@ class Router
         ?string $func = null,
     ): void
     {
+        $route = preg_replace('/\//', '\\/', $uri);
+        $matcher = preg_replace('/\{([a-z_]+)\}/', '(?P<\1>[^\/]+)', $route);
+
+        preg_match_all('/{([^}]*)}/', $uri, $params);
         $this->routes[] = [
             'uri' => $uri,
             'handler' => $handler,
             'func' => $func,
-            'method' => $method
+            'method' => $method,
+            'params' => $params[1],
+            'matcher' => '/^' . $matcher . '$/i'
         ];
     }
 
@@ -105,5 +133,23 @@ class Router
             $handler,
             $method
         );
+    }
+
+    /**
+     * @return Application
+     */
+    public function getApp(): Application
+    {
+        return $this->app;
+    }
+
+    /**
+     * @param Application $app
+     * @return Router
+     */
+    public function setApp(Application $app): static
+    {
+        $this->app = $app;
+        return $this;
     }
 }
