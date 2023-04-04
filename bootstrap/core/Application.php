@@ -39,6 +39,17 @@ class Application
     /**
      * @throws \Exception
      */
+    public static function make(string $class): mixed
+    {
+        return static::container()->make($class);
+    }
+
+
+    public static function get(string $class): mixed
+    {
+        return static::container()->get($class);
+    }
+
     public static function resolve(string $class): mixed
     {
         return static::container()->resolve($class);

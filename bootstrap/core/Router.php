@@ -8,19 +8,23 @@ class Router
 
     protected array $routes = [];
 
+    /**
+     * @throws \ReflectionException
+     */
     public function route(
         string $method,
         string $uri,
     )
     {
+//        $method = 'GET';
+//        $uri = '/hello/1/go';
         foreach ($this->routes as $route) {
             if (
                 $this->match($route, $uri)
                 && strtoupper($method) === $route['method']
             ) {
-                return (new $route['handler'])->{$route['func']}(
-                    $this->app->getRequest()
-                );
+                $this->app::resolve($route['handler']);
+                return $this->resolveHandlerWithDependencies($route);
             }
         }
         return abort(404);
@@ -54,13 +58,12 @@ class Router
         $route = preg_replace('/\//', '\\/', $uri);
         $matcher = preg_replace('/\{([a-z_]+)\}/', '(?P<\1>[^\/]+)', $route);
 
-        preg_match_all('/{([^}]*)}/', $uri, $params);
         $this->routes[] = [
             'uri' => $uri,
             'handler' => $handler,
             'func' => $func,
             'method' => $method,
-            'params' => $params[1],
+            'params' => [],
             'matcher' => '/^' . $matcher . '$/i'
         ];
     }
@@ -152,4 +155,17 @@ class Router
         $this->app = $app;
         return $this;
     }
+
+    /**
+     * @throws \ReflectionException
+     */
+    private function resolveHandlerWithDependencies(mixed $route)
+    {
+        $instance = $this->app::get($route['handler']);
+        return $instance->{$route['func']}(
+            $this->app->getRequest(),
+            ...$route['params']
+        );
+    }
+
 }
